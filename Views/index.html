@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tech Store Inventory</title>
+  <style>
+    :root {
+      --bg: #f7f4ee;
+      --card: #fffaf2;
+      --ink: #192428;
+      --muted: #5b686f;
+      --brand: #0e8c86;
+      --brand-ink: #ffffff;
+      --accent: #f28c28;
+      --danger: #c0392b;
+      --line: #d8d2c5;
+      --shadow: 0 14px 36px rgba(25, 36, 40, 0.12);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(242, 140, 40, 0.14), transparent 45%),
+        radial-gradient(circle at 80% 0%, rgba(14, 140, 134, 0.16), transparent 40%),
+        var(--bg);
+      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+      min-height: 100vh;
+    }
+
+    .shell {
+      width: min(1100px, 94%);
+      margin: 28px auto;
+      animation: rise 0.55s ease;
+    }
+
+    .headline {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow {
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+
+    h1 {
+      margin: 0;
+      line-height: 1.1;
+      font-size: clamp(1.8rem, 3.2vw, 2.8rem);
+    }
+
+    .sub {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+      gap: 16px;
+    }
+
+    .card {
+      background: linear-gradient(170deg, var(--card), #fffdf8);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .stat {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .stat strong {
+      font-size: clamp(1.4rem, 2.2vw, 2.1rem);
+      color: var(--brand);
+    }
+
+    .controls {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    input,
+    select,
+    button {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      font-size: 0.97rem;
+      font-family: inherit;
+    }
+
+    input:focus,
+    select:focus {
+      outline: 2px solid rgba(14, 140, 134, 0.25);
+      border-color: var(--brand);
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      background: var(--brand);
+      color: var(--brand-ink);
+      font-weight: 700;
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(0.96);
+    }
+
+    .ghost {
+      background: #e9f6f5;
+      color: #17504d;
+      border: 1px solid #caebe9;
+    }
+
+    .danger {
+      background: #fce7e4;
+      color: var(--danger);
+      border: 1px solid #f2c0b9;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 660px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid #ece5da;
+      font-size: 0.93rem;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f6f0e6;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .inline-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .inline-actions button {
+      padding: 8px 10px;
+      font-size: 0.85rem;
+    }
+
+    .message {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .ok {
+      background: #e5f6ed;
+      color: #1f6b44;
+      border: 1px solid #c7ebd7;
+      display: block;
+    }
+
+    .err {
+      background: #fdecea;
+      color: #8d271e;
+      border: 1px solid #f7cec9;
+      display: block;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.34);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 1000;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-card {
+      position: relative;
+      width: min(520px, 100%);
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid #ded8cc;
+      padding: 16px;
+      animation: rise 0.25s ease;
+      z-index: 1001;
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .modal-head h2 {
+      margin: 0;
+      font-size: 1.15rem;
+    }
+
+    .close {
+      width: auto;
+      padding: 7px 10px;
+      background: #f4efe4;
+      color: #415055;
+      border: 1px solid #ddd4c4;
+    }
+
+    @keyframes rise {
+      from {
+        transform: translateY(14px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 880px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .shell {
+        margin: 16px auto 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="headline">
+      <span class="eyebrow">Inventory Module</span>
+      <h1>Tech Store Management</h1>
+      <p class="sub">Manage products, filter instantly in browser, and track total inventory value.</p>
+    </header>
+
+    <section class="grid">
+      <aside class="card">
+        <div class="stat">
+          <span>Total Inventory Value</span>
+          <strong id="totalValue">$0.00</strong>
+          <small class="sub">Formula: sum(price x quantity)</small>
+        </div>
+
+        <form id="createForm" class="controls">
+          <label for="name">Product Name</label>
+          <input id="name" name="name" type="text" maxlength="150" required>
+
+          <label for="price">Price</label>
+          <input id="price" name="price" type="number" min="0.01" step="0.01" required>
+
+          <label for="quantity">Quantity</label>
+          <input id="quantity" name="quantity" type="number" min="1" step="1" required>
+
+          <label for="categoryId">Category</label>
+          <select id="categoryId" name="categoryId" required></select>
+
+          <div class="actions">
+            <button type="submit">Add Product</button>
+            <button type="button" id="refreshBtn" class="ghost">Refresh</button>
+          </div>
+        </form>
+
+        <div id="message" class="message"></div>
+      </aside>
+
+      <section class="card">
+        <div class="controls">
+          <label for="search">Search by Product Name (client-side)</label>
+          <input id="search" type="text" placeholder="Type to filter loaded data...">
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Value</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="productRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <section id="editModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2>Edit Product</h2>
+        <button type="button" id="closeModalBtn" class="close">Close</button>
+      </div>
+
+      <form id="editForm" class="controls">
+        <input id="editId" name="editId" type="hidden">
+
+        <label for="editName">Product Name</label>
+        <input id="editName" name="editName" type="text" maxlength="150" required>
+
+        <label for="editPrice">Price</label>
+        <input id="editPrice" name="editPrice" type="number" min="0.01" step="0.01" required>
+
+        <label for="editQuantity">Quantity</label>
+        <input id="editQuantity" name="editQuantity" type="number" min="1" step="1" required>
+
+        <label for="editCategoryId">Category</label>
+        <select id="editCategoryId" name="editCategoryId" required></select>
+
+        <div class="actions">
+          <button type="submit">Save</button>
+          <button type="button" id="cancelEditBtn" class="ghost">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    const API_BASE_URL = "http://localhost:6969";
+
+    const endpoints = {
+      categories: API_BASE_URL + "/api/categories",
+      products: API_BASE_URL + "/api/products",
+      total: API_BASE_URL + "/api/products/total-inventory-value"
+    };
+
+    const state = {
+      products: [],
+      categories: []
+    };
+
+    const refs = {
+      totalValue: document.getElementById("totalValue"),
+      message: document.getElementById("message"),
+      rows: document.getElementById("productRows"),
+      search: document.getElementById("search"),
+      createForm: document.getElementById("createForm"),
+      refreshBtn: document.getElementById("refreshBtn"),
+      categorySelect: document.getElementById("categoryId"),
+      editModal: document.getElementById("editModal"),
+      editForm: document.getElementById("editForm"),
+      closeModalBtn: document.getElementById("closeModalBtn"),
+      cancelEditBtn: document.getElementById("cancelEditBtn"),
+      editId: document.getElementById("editId"),
+      editName: document.getElementById("editName"),
+      editPrice: document.getElementById("editPrice"),
+      editQuantity: document.getElementById("editQuantity"),
+      editCategoryId: document.getElementById("editCategoryId")
+    };
+
+    function notify(message, type) {
+      refs.message.className = "message " + (type === "error" ? "err" : "ok");
+      refs.message.textContent = message;
+    }
+
+    function clearNotify() {
+      refs.message.className = "message";
+      refs.message.textContent = "";
+    }
+
+    function money(value) {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 2
+      }).format(Number(value || 0));
+    }
+
+    async function apiFetch(url, options) {
+      const response = await fetch(url, options);
+      if (response.status === 204) {
+        return null;
+      }
+
+      let payload = null;
+      try {
+        payload = await response.json();
+      } catch {
+        payload = null;
+      }
+
+      if (!response.ok) {
+        const message = payload && payload.message ? payload.message : "Request failed.";
+        throw new Error(message);
+      }
+
+      return payload;
+    }
+
+    function setCategoryOptions(selectEl, categories) {
+      if (!categories.length) {
+        selectEl.innerHTML = "<option value=''>No categories</option>";
+        selectEl.disabled = true;
+        return;
+      }
+
+      selectEl.disabled = false;
+      selectEl.innerHTML = categories
+        .map(category => "<option value='" + category.id + "'>" + escapeHtml(category.name) + "</option>")
+        .join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function renderProducts(list) {
+      if (!list.length) {
+        refs.rows.innerHTML = "<tr><td colspan='6'>No products found.</td></tr>";
+        return;
+      }
+
+      refs.rows.innerHTML = list.map(product => {
+        const rowValue = Number(product.price) * Number(product.quantity);
+        return "<tr>"
+          + "<td>" + escapeHtml(product.name) + "</td>"
+          + "<td>" + escapeHtml(product.categoryName || "") + "</td>"
+          + "<td>" + money(product.price) + "</td>"
+          + "<td>" + product.quantity + "</td>"
+          + "<td>" + money(rowValue) + "</td>"
+          + "<td><div class='inline-actions'>"
+          + "<button type='button' class='ghost' data-action='edit' data-id='" + product.id + "'>Edit</button>"
+          + "<button type='button' class='danger' data-action='delete' data-id='" + product.id + "'>Delete</button>"
+          + "</div></td>"
+          + "</tr>";
+      }).join("");
+    }
+
+    function applySearch() {
+      const keyword = refs.search.value.trim().toLowerCase();
+      const filtered = !keyword
+        ? state.products
+        : state.products.filter(product => product.name.toLowerCase().includes(keyword));
+
+      renderProducts(filtered);
+    }
+
+    async function loadCategories() {
+      const categories = await apiFetch(endpoints.categories);
+      state.categories = Array.isArray(categories) ? categories : [];
+      setCategoryOptions(refs.categorySelect, state.categories);
+      setCategoryOptions(refs.editCategoryId, state.categories);
+    }
+
+    async function loadProducts() {
+      const products = await apiFetch(endpoints.products);
+      state.products = Array.isArray(products) ? products : [];
+      applySearch();
+    }
+
+    async function loadTotal() {
+      const result = await apiFetch(endpoints.total);
+      refs.totalValue.textContent = money(result ? result.totalInventoryValue : 0);
+    }
+
+    async function refreshAll() {
+      clearNotify();
+      try {
+        await Promise.all([loadCategories(), loadProducts(), loadTotal()]);
+      } catch (error) {
+        notify(error.message, "error");
+      }
+    }
+
+    function parseForm(form, isEdit) {
+      const get = name => form.elements[name].value;
+      return {
+        name: get(isEdit ? "editName" : "name").trim(),
+        price: Number(get(isEdit ? "editPrice" : "price")),
+        quantity: Number(get(isEdit ? "editQuantity" : "quantity")),
+        categoryId: Number(get(isEdit ? "editCategoryId" : "categoryId"))
+      };
+    }
+
+    function openEditModal(product) {
+      refs.editId.value = product.id;
+      refs.editName.value = product.name;
+      refs.editPrice.value = product.price;
+      refs.editQuantity.value = product.quantity;
+      refs.editCategoryId.value = product.categoryId;
+      refs.editModal.classList.add("show");
+      refs.editModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeEditModal() {
+      refs.editModal.classList.remove("show");
+      refs.editModal.setAttribute("aria-hidden", "true");
+      refs.editForm.reset();
+    }
+
+    refs.createForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      clearNotify();
+
+      try {
+        const body = parseForm(refs.createForm, false);
+        await apiFetch(endpoints.products, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+
+        refs.createForm.reset();
+        await Promise.all([loadProducts(), loadTotal()]);
+        notify("Product created.", "ok");
+      } catch (error) {
+        notify(error.message, "error");
+      }
+    });
+
+    refs.editForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      clearNotify();
+
+      try {
+        const id = Number(refs.editId.value);
+        const body = parseForm(refs.editForm, true);
+
+        await apiFetch(endpoints.products + "/" + id, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+
+        closeEditModal();
+        await Promise.all([loadProducts(), loadTotal()]);
+        notify("Product updated.", "ok");
+      } catch (error) {
+        notify(error.message, "error");
+      }
+    });
+
+    refs.rows.addEventListener("click", async event => {
+      const target = event.target;
+      if (!(target instanceof HTMLButtonElement)) {
+        return;
+      }
+
+      const action = target.dataset.action;
+      const id = Number(target.dataset.id);
+      if (!id || !action) {
+        return;
+      }
+
+      if (action === "edit") {
+        const product = state.products.find(item => item.id === id);
+        if (product) {
+          openEditModal(product);
+        }
+        return;
+      }
+
+      if (action === "delete") {
+        const accepted = window.confirm("Delete this product?");
+        if (!accepted) {
+          return;
+        }
+
+        clearNotify();
+        try {
+          await apiFetch(endpoints.products + "/" + id, { method: "DELETE" });
+          await Promise.all([loadProducts(), loadTotal()]);
+          notify("Product deleted.", "ok");
+        } catch (error) {
+          notify(error.message, "error");
+        }
+      }
+    });
+
+    refs.search.addEventListener("input", applySearch);
+    refs.refreshBtn.addEventListener("click", refreshAll);
+    refs.closeModalBtn.addEventListener("click", closeEditModal);
+    refs.cancelEditBtn.addEventListener("click", closeEditModal);
+
+    refs.editModal.addEventListener("click", event => {
+      if (event.target === refs.editModal) {
+        closeEditModal();
+      }
+    });
+
+    refreshAll();
+  </script>
+</body>
+</html>
