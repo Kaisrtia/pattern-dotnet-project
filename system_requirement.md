@@ -1,0 +1,27 @@
+# [cite_start]XÂY DỰNG HỆ THỐNG QUẢN LÝ CỬA HÀNG CÔNG NGHỆ [cite: 29]
+
+## [cite_start]1. Mô tả bài toán (Problem Description) [cite: 30]
+[cite_start]Sinh viên thực hiện vai trò kỹ sư phần mềm để xây dựng module quản lý kho hàng cho một cửa hàng thiết bị công nghệ. [cite: 31, 32] [cite_start]Hệ thống được phát triển theo mô hình Client-Server tách biệt: [cite: 32]
+* [cite_start]**Backend API:** Xây dựng bằng ASP.NET Core Web API, đảm nhận xử lý nghiệp vụ và kết nối SQL Server qua Entity Framework Core. [cite: 33]
+* [cite_start]**Client Side:** Xây dựng giao diện Web bằng HTML5, CSS3 và JavaScript thuần (hoặc Fetch API) để tương tác với người dùng. [cite: 34]
+
+## [cite_start]2. Đặc tả cơ sở dữ liệu (Data Schema) [cite: 35]
+[cite_start]Hệ thống quản lý thông tin dựa trên hai thực thể chính với mối quan hệ 1:N: [cite: 36]
+* [cite_start]**Category (Danh mục):** Id (Khóa chính), Name (Tên danh mục). [cite: 37]
+* [cite_start]**Product (Sản phẩm):** Id, Name, Price, Quantity, CategoryId (Khóa ngoại). [cite: 38]
+
+## [cite_start]3. Đặc tả chức năng (Functional Requirements) [cite: 39]
+[cite_start]Sinh viên triển khai các chức năng sau trên giao diện Web thông qua việc gọi các Endpoint API: [cite: 40]
+* [cite_start]**REQ-01 (Hiển thị):** Sử dụng Table trong HTML để hiển thị danh sách sản phẩm. [cite: 41] [cite_start]Dữ liệu phải bao gồm tên danh mục cụ thể (CategoryName) thay vì chỉ hiển thị mã ID. [cite: 42]
+* [cite_start]**REQ-02 (Thao tác CRUD):** [cite: 43]
+    * [cite_start]Thêm mới: Form nhập liệu có `<select>` để chọn danh mục (dữ liệu danh mục phải được load động từ API). [cite: 44]
+    * [cite_start]Cập nhật: Cho phép chỉnh sửa thông tin sản phẩm trực tiếp hoặc qua Modal/Form. [cite: 45]
+    * [cite_start]Xóa: Loại bỏ sản phẩm sau khi người dùng xác nhận qua lệnh confirm() của JavaScript. [cite: 46]
+* [cite_start]**REQ-03 (Tính toán nghiệp vụ):** Hiển thị Tổng giá trị hàng tồn kho tại một vị trí nổi bật trên trang web. [cite: 47] [cite_start]Công thức: $\sum (Price \times Quantity)$. [cite: 48]
+* [cite_start]**REQ-04 (Tìm kiếm):** Chức năng lọc sản phẩm theo tên ngay trên trình duyệt bằng JavaScript (Lọc trực tiếp trên mảng dữ liệu đã tải về, không gọi lại API khi người dùng đang nhập liệu). [cite: 49]
+
+## [cite_start]4. Quy tắc nghiệp vụ và Ràng buộc kỹ thuật (Business Rules & Constraints) [cite: 50]
+* [cite_start]**Quy tắc nghiệp vụ:** Đơn giá và Số lượng phải là số dương (>0). [cite: 51] [cite_start]Logic tính tổng giá trị kho phải được thực hiện bằng LINQ/Lambda tại Backend. [cite: 52]
+* [cite_start]**Cú pháp Backend:** Bắt buộc sử dụng Primary Constructors (C# 14) để thực hiện Dependency Injection. [cite: 53]
+* [cite_start]**Giao tiếp dữ liệu:** Sử dụng định dạng JSON cho mọi luồng trao đổi dữ liệu giữa Client và Server. [cite: 54] [cite_start]Sinh viên cần cấu hình CORS tại Backend để cho phép Client truy cập. [cite: 55]
+* [cite_start]**Frontend Logic:** Sử dụng fetch() hoặc axios để thực hiện các phương thức GET, POST, PUT, DELETE. [cite: 56] [cite_start]Yêu cầu xử lý lỗi (catch) nếu API phản hồi không thành công. [cite: 57]
