@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Asset Manager</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: rgba(10, 18, 32, 0.88);
+      --panel-border: rgba(255, 255, 255, 0.08);
+      --text: #e5eefc;
+      --muted: #8ca3c6;
+      --accent: #4f8cff;
+      --accent-2: #22c55e;
+      --danger: #ef4444;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(79, 140, 255, 0.18), transparent 32%),
+        radial-gradient(circle at top right, rgba(34, 197, 94, 0.16), transparent 28%),
+        linear-gradient(180deg, #07111f 0%, #0b1629 100%);
+      min-height: 100vh;
+    }
+
+    .container {
+      width: min(1200px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    .hero {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: 1.4fr 0.9fr;
+      align-items: end;
+      margin-bottom: 24px;
+    }
+
+    .hero-card,
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .hero-card {
+      padding: 28px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(79, 140, 255, 0.14);
+      color: #cfe0ff;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      line-height: 1.02;
+    }
+
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      max-width: 72ch;
+      line-height: 1.6;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .stat strong {
+      font-size: 24px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      padding: 20px;
+    }
+
+    .panel h2 {
+      margin: 0 0 16px;
+      font-size: 20px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(8, 15, 28, 0.92);
+      color: var(--text);
+      outline: none;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: rgba(79, 140, 255, 0.7);
+      box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.16);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: linear-gradient(135deg, var(--accent), #7c9cff);
+      color: white;
+    }
+
+    .ghost {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .table-wrap {
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+    }
+
+    th,
+    td {
+      padding: 14px 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      vertical-align: top;
+    }
+
+    th {
+      color: #b8c7e1;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .badge::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.75);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .status {
+      margin-top: 12px;
+      min-height: 22px;
+      font-size: 14px;
+    }
+
+    .status.ok {
+      color: #86efac;
+    }
+
+    .status.err {
+      color: #fca5a5;
+    }
+
+    .empty {
+      padding: 30px 18px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <div class="hero-card">
+        <div class="eyebrow">Smart Asset Manager</div>
+        <h1>Quản trị danh mục tài sản đơn giản, rõ ràng, đúng kiểu TPT.</h1>
+        <p class="lead">
+          Trang này chạy độc lập với Live Server và gọi trực tiếp API ASP.NET Core.
+          Backend sẽ quyết định loại tài sản, nhãn hiển thị và màu sắc; giao diện chỉ render dữ liệu sẵn có.
+        </p>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <span>Tài sản hiện có</span>
+          <strong id="countAssets">0</strong>
+        </div>
+        <div class="stat">
+          <span>Tổng giá trị hiện hành</span>
+          <strong id="totalValue">0</strong>
+        </div>
+        <div class="stat">
+          <span>API status</span>
+          <strong id="apiStatus">Idle</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="panel">
+        <h2>Thêm tài sản</h2>
+        <div class="field">
+          <label for="assetType">Loại tài sản</label>
+          <select id="assetType">
+            <option value="cash">Cash</option>
+            <option value="crypto">Crypto</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="apiBase">Backend URL</label>
+          <input id="apiBase" type="text" placeholder="http://localhost:5000">
+        </div>
+
+        <div class="field">
+          <label for="name">Tên tài sản</label>
+          <input id="name" type="text" placeholder="Ví dụ: Quỹ dự phòng" maxlength="120">
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="originalValue">Giá gốc</label>
+            <input id="originalValue" type="number" min="0" step="0.01" placeholder="1000000">
+          </div>
+          <div class="field" id="multiplierField">
+            <label for="multiplier">Hệ số</label>
+            <input id="multiplier" type="number" min="0" step="0.000001" placeholder="1.25">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="responsiblePerson">Người chịu trách nhiệm</label>
+          <input id="responsiblePerson" type="text" placeholder="Ví dụ: Nguyễn Văn A" maxlength="100">
+        </div>
+
+        <div class="actions">
+          <button class="primary" id="submitBtn" type="button">Lưu tài sản</button>
+          <button class="ghost" id="reloadBtn" type="button">Tải lại danh sách</button>
+        </div>
+
+        <div id="formStatus" class="status"></div>
+        <div class="footer-note">
+          Cash giữ nguyên giá trị. Crypto dùng công thức <strong>Giá gốc × Hệ số</strong>.
+          Nếu nhập hệ số âm, backend sẽ trả lỗi 400.
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Danh sách tài sản</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Loại</th>
+                <th>Tên</th>
+                <th>Giá gốc</th>
+                <th>Hệ số</th>
+                <th>Giá hiện hành</th>
+                <th>Người phụ trách</th>
+                <th>Thời gian tạo</th>
+              </tr>
+            </thead>
+            <tbody id="assetTableBody">
+              <tr>
+                <td colspan="7" class="empty">Chưa có dữ liệu</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const elements = {
+      assetType: document.getElementById("assetType"),
+      apiBase: document.getElementById("apiBase"),
+      name: document.getElementById("name"),
+      originalValue: document.getElementById("originalValue"),
+      multiplier: document.getElementById("multiplier"),
+      multiplierField: document.getElementById("multiplierField"),
+      responsiblePerson: document.getElementById("responsiblePerson"),
+      submitBtn: document.getElementById("submitBtn"),
+      reloadBtn: document.getElementById("reloadBtn"),
+      assetTableBody: document.getElementById("assetTableBody"),
+      countAssets: document.getElementById("countAssets"),
+      totalValue: document.getElementById("totalValue"),
+      apiStatus: document.getElementById("apiStatus"),
+      formStatus: document.getElementById("formStatus")
+    };
+
+    const apiBaseStorageKey = "pattern-project-api-base";
+
+    function formatMoney(value) {
+      return new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+        maximumFractionDigits: 2
+      }).format(value ?? 0);
+    }
+
+    function formatDateTime(value) {
+      return value ? new Date(value).toLocaleString("vi-VN") : "-";
+    }
+
+    function setStatus(message, type = "") {
+      elements.formStatus.textContent = message;
+      elements.formStatus.className = `status ${type}`.trim();
+    }
+
+    function getApiBase() {
+      return elements.apiBase.value.trim() || getDefaultApiBase();
+    }
+
+    function getDefaultApiBase() {
+      if (window.location.protocol === "file:") {
+        return "http://localhost:6969";
+      }
+
+      return window.location.origin;
+    }
+
+    function updateFormMode() {
+      const isCrypto = elements.assetType.value === "crypto";
+      elements.multiplierField.style.opacity = isCrypto ? "1" : "0.4";
+      elements.multiplier.disabled = !isCrypto;
+      if (!isCrypto) {
+        elements.multiplier.value = "";
+      }
+    }
+
+    async function loadAssets() {
+      elements.apiStatus.textContent = "Loading";
+      try {
+        const response = await fetch(`${getApiBase()}/api/assets`);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const assets = await response.json();
+        renderAssets(Array.isArray(assets) ? assets : []);
+        elements.apiStatus.textContent = "Ready";
+        setStatus("Danh sách đã được tải.", "ok");
+      } catch (error) {
+        elements.apiStatus.textContent = "Offline";
+        setStatus(`Không tải được danh sách: ${error.message}`, "err");
+      }
+    }
+
+    function renderAssets(assets) {
+      elements.countAssets.textContent = String(assets.length);
+      const total = assets.reduce((sum, asset) => sum + (asset.currentValue ?? 0), 0);
+      elements.totalValue.textContent = formatMoney(total);
+
+      if (assets.length === 0) {
+        elements.assetTableBody.innerHTML = '<tr><td colspan="7" class="empty">Chưa có dữ liệu</td></tr>';
+        return;
+      }
+
+      elements.assetTableBody.innerHTML = assets.map((asset) => `
+        <tr>
+          <td><span class="badge" style="background:${asset.displayColor}">${asset.displayLabel}</span></td>
+          <td>${escapeHtml(asset.name)}</td>
+          <td>${formatMoney(asset.originalValue)}</td>
+          <td>${asset.multiplier ?? "-"}</td>
+          <td><strong>${formatMoney(asset.currentValue)}</strong></td>
+          <td>${escapeHtml(asset.responsiblePerson)}</td>
+          <td class="muted">${formatDateTime(asset.createdAtUtc)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    async function submitAsset() {
+      const name = elements.name.value.trim();
+      const originalValue = Number(elements.originalValue.value);
+      const responsiblePerson = elements.responsiblePerson.value.trim();
+      const isCrypto = elements.assetType.value === "crypto";
+
+      if (!name || !responsiblePerson || Number.isNaN(originalValue)) {
+        setStatus("Vui lòng nhập đầy đủ tên, giá gốc và người chịu trách nhiệm.", "err");
+        return;
+      }
+
+      const payload = {
+        name,
+        originalValue,
+        responsiblePerson
+      };
+
+      let endpoint = "/api/assets/cash";
+      if (isCrypto) {
+        const multiplier = Number(elements.multiplier.value);
+        if (Number.isNaN(multiplier)) {
+          setStatus("Vui lòng nhập hệ số cho Crypto.", "err");
+          return;
+        }
+
+        payload.multiplier = multiplier;
+        endpoint = "/api/assets/crypto";
+      }
+
+      elements.submitBtn.disabled = true;
+      setStatus("Đang lưu tài sản...", "");
+
+      try {
+        const response = await fetch(`${getApiBase()}${endpoint}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText || `HTTP ${response.status}`);
+        }
+
+        elements.name.value = "";
+        elements.originalValue.value = "";
+        elements.multiplier.value = "";
+        elements.responsiblePerson.value = "";
+        setStatus("Đã lưu tài sản thành công.", "ok");
+        await loadAssets();
+      } catch (error) {
+        setStatus(`Không thể lưu tài sản: ${error.message}`, "err");
+      } finally {
+        elements.submitBtn.disabled = false;
+      }
+    }
+
+    elements.assetType.addEventListener("change", updateFormMode);
+    elements.apiBase.addEventListener("change", () => {
+      localStorage.setItem(apiBaseStorageKey, elements.apiBase.value.trim());
+      setStatus("Đã lưu backend URL.", "ok");
+    });
+    elements.submitBtn.addEventListener("click", submitAsset);
+    elements.reloadBtn.addEventListener("click", loadAssets);
+
+    elements.apiBase.value = localStorage.getItem(apiBaseStorageKey) || getDefaultApiBase();
+    updateFormMode();
+    loadAssets();
+  </script>
+</body>
+</html>
