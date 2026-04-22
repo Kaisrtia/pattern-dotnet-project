@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hệ Thống Quản Lý Hồ Sơ Y Tế</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">🏥 Quản Lý Hồ Sơ Y Tế</span>
+      <div class="d-flex align-items-center">
+        <span id="userDisplay" class="text-white me-3" style="display: none;"></span>
+        <button id="logoutBtn" class="btn btn-outline-light" style="display: none;">Đăng Xuất</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <!-- Login Section -->
+    <section id="loginSection" class="row justify-content-center">
+      <div class="col-md-5">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">🔐 Đăng Nhập</h5>
+          </div>
+          <div class="card-body">
+            <form id="loginForm">
+              <div class="mb-3">
+                <label for="username" class="form-label">Tên đăng nhập</label>
+                <input type="text" class="form-control" id="username" placeholder="admin, patientA, patientB" required>
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Mật khẩu</label>
+                <input type="password" class="form-control" id="password" placeholder="Admin@123 hoặc User@123" required>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Đăng Nhập</button>
+            </form>
+            <div id="loginError" class="alert alert-danger mt-3" style="display: none;"></div>
+            <hr>
+            <p class="small text-muted mb-1"><strong>Tài khoản test:</strong></p>
+            <p class="small text-muted mb-1">Admin: admin / Admin@123</p>
+            <p class="small text-muted">Bệnh nhân: patientA / User@123</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content (After Login) -->
+    <section id="mainContent" style="display: none;">
+      <div class="row">
+        <!-- Sidebar Navigation -->
+        <div class="col-md-3">
+          <div class="list-group sticky-top">
+            <button id="tabMyHistory" class="list-group-item list-group-item-action active" data-tab="myHistory">
+              📋 Lịch Sử Của Tôi
+            </button>
+            <button id="tabCreateRecord" class="list-group-item list-group-item-action" data-tab="createRecord" style="display: none;">
+              ➕ Tạo Hồ Sơ Mới
+            </button>
+            <button id="tabAllRecords" class="list-group-item list-group-item-action" data-tab="allRecords" style="display: none;">
+              📄 Tất Cả Hồ Sơ
+            </button>
+          </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="col-md-9">
+          <!-- My History Tab -->
+          <div id="myHistoryTab" class="tab-content">
+            <div class="card shadow">
+              <div class="card-header bg-info text-white">
+                <h5 class="mb-0">📋 Lịch Sử Khám Bệnh Của Tôi</h5>
+              </div>
+              <div class="card-body">
+                <div id="myHistoryList" class="records-list"></div>
+                <div id="myHistoryEmpty" class="alert alert-info" style="display: none;">
+                  Không có hồ sơ y tế nào.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Create Record Tab (Admin Only) -->
+          <div id="createRecordTab" class="tab-content" style="display: none;">
+            <div class="card shadow">
+              <div class="card-header bg-success text-white">
+                <h5 class="mb-0">➕ Tạo Hồ Sơ Y Tế Mới</h5>
+              </div>
+              <div class="card-body">
+                <form id="createRecordForm">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="recordType" class="form-label">Loại Hồ Sơ *</label>
+                      <select class="form-select" id="recordType" required>
+                        <option value="">-- Chọn Loại --</option>
+                        <option value="inpatient">Nội Trú (Nằm Viện)</option>
+                        <option value="outpatient">Ngoại Trú (Khám Rồi Về)</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="recordCode" class="form-label">Mã Hồ Sơ *</label>
+                      <input type="text" class="form-control" id="recordCode" placeholder="VD: INP001, OUT001" required>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="examinationDate" class="form-label">Ngày Khám *</label>
+                      <input type="date" class="form-control" id="examinationDate" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="patientId" class="form-label">Bệnh Nhân (ID) *</label>
+                      <input type="number" class="form-control" id="patientId" placeholder="2 hoặc 3" min="1" required>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="diagnosis" class="form-label">Chẩn Đoán *</label>
+                    <textarea class="form-control" id="diagnosis" rows="2" placeholder="Nội dung chẩn đoán..." required></textarea>
+                  </div>
+
+                  <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="isDangerousInfectious">
+                    <label class="form-check-label" for="isDangerousInfectious">
+                      Bệnh Truyền Nhiễm Nguy Hiểm
+                    </label>
+                  </div>
+
+                  <div id="verificationCodeGroup" class="mb-3" style="display: none;">
+                    <label for="medicalVerificationCode" class="form-label">Mã Xác Thực Y Tế *</label>
+                    <input type="text" class="form-control" id="medicalVerificationCode" placeholder="VD: MVC20260420001">
+                  </div>
+
+                  <!-- Inpatient Fields -->
+                  <div id="inpatientGroup" style="display: none;" class="border-top pt-3">
+                    <h6 class="mb-3">Thông Tin Nội Trú</h6>
+                    <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label for="roomNumber" class="form-label">Số Phòng *</label>
+                        <input type="text" class="form-control" id="roomNumber" placeholder="VD: 101, 102">
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label for="bedNumber" class="form-label">Số Giường *</label>
+                        <input type="text" class="form-control" id="bedNumber" placeholder="VD: A1, B2">
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Outpatient Fields -->
+                  <div id="outpatientGroup" style="display: none;" class="border-top pt-3">
+                    <h6 class="mb-3">Thông Tin Ngoại Trú</h6>
+                    <div class="mb-3">
+                      <label for="ePrescriptionCode" class="form-label">Mã Toa Thuốc Điện Tử *</label>
+                      <input type="text" class="form-control" id="ePrescriptionCode" placeholder="VD: RX20260420001">
+                    </div>
+                  </div>
+
+                  <button type="submit" class="btn btn-success w-100 mt-3">💾 Lưu Hồ Sơ</button>
+                </form>
+                <div id="createRecordError" class="alert alert-danger mt-3" style="display: none;"></div>
+                <div id="createRecordSuccess" class="alert alert-success mt-3" style="display: none;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- All Records Tab (Admin Only) -->
+          <div id="allRecordsTab" class="tab-content" style="display: none;">
+            <div class="card shadow">
+              <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">📄 Tất Cả Hồ Sơ Y Tế</h5>
+              </div>
+              <div class="card-body">
+                <div id="allRecordsList" class="records-list"></div>
+                <div id="allRecordsEmpty" class="alert alert-info" style="display: none;">
+                  Không có hồ sơ y tế nào.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div id="loadingSpinner" class="spinner-container" style="display: none;">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Đang tải...</span>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
